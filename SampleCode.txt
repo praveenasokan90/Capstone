@@ -1,0 +1,145 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract patientRecord
+{
+    address public Owner;
+    struct doctor
+    {   
+        uint   docId;
+        string name;
+        string qualification;
+        string workPlace;
+    }
+
+    struct patient 
+    {
+        uint   patientId;
+        string name;
+        uint   age;
+        
+    }
+
+    struct disease
+    {   uint   patientId;
+        string diseaseName;
+    }
+
+    struct medicine
+    {
+        uint   medicineId;
+        string medicineName;
+        string expiryDate;
+        string dose;
+        uint   medicinePrice;
+    }
+
+    struct prescribedMedicine
+    {
+        uint    medicineId;
+        address patientAddress; 
+    }
+
+   // patient[] patients;
+    mapping(uint=>doctor) doctorMap;
+    mapping(uint=>patient) patientMap;
+    mapping(uint=>disease) diseaseMap;
+    mapping(uint=>medicine) medicineMap;
+    mapping(address => prescribedMedicine) prescribedMap;
+
+    constructor()
+    {
+        owner = msg.sender;
+    }
+
+	modifier onlyOwner()
+    {
+        require(msg.sender == Owner, "!!! Not the Patient !!!");
+        _;
+    }
+	
+    //No.1>>>!.......Function to register a new doctor......!
+	
+    function registerDoctor(uint _docId, string memory _name,
+                            string memory _qualification, 
+                            string memory _workPlace 
+                            )public
+    {
+        doctorMap[_docId] = doctor(_docId,_name,_qualification,_workPlace);
+    }                         
+
+    //No.2>>>!.......Function to register a new patient......!
+	
+    function registerPatient(uint _patientId,string memory _name, uint _age) public 
+    {
+      patientMap[_patientId] = patient(_patientId,_name,_age);
+    }
+
+    //No.3>>>!.......Function to add new disease......!
+	
+	//It is working for single disease need your help when a single patient is having multiple disease.
+																							
+    function addNewDisease(uint _patientId,string memory _diseaseName) public 
+    {
+        diseaseMap[_patientId] = disease(_patientId,_diseaseName);
+    }
+
+    //No.4>>>!.......Function to add new medicine......!
+	
+    function addMedicine( uint _medicineId, string memory _name,
+                          string memory _expiryDate, string memory _dose,
+                          uint _price  
+                        ) public
+    {
+        medicineMap[_medicineId] = medicine(_medicineId,_name,_expiryDate,_dose,_price);
+      
+    }
+
+    //No.5>>>!.......Function to add prescribed medicine......!
+	
+    function prescribeMedicine(uint _medicineId, address _patientAddress) public 
+    {
+       prescribedMap[_patientAddress] = prescribedMedicine(_medicineId,_patientAddress);
+    }
+
+    //No.6>>>!.......Function to updateAge......!
+	
+    function updateAge(uint _pId, uint _age) public 
+    {   
+        patientMap[_pId].age = _age;
+    }
+
+    //No.7>>>!....Funciton to view patient data from blockchain......!
+	function viewPatientData(uint _patientId)public onlyOwner returns(patient memory, disease memory) 
+	{
+		return(patientMap[_patientId], diseaseMap[_patientId]);
+	}
+
+    //No.8>>>!....Funciton to view Medicine Details......!
+    function viewMedicine(uint _id) public view returns(medicine memory)
+    {
+        return(medicineMap[_id]);
+    }                    
+
+    //No.9>>>!....Funciton to view patient data by doctor......!
+	function viewPatientData(uint _patientId)public returns(patient memory, disease memory) 
+	{
+		return(patientMap[_patientId], diseaseMap[_patientId]);
+	}	
+
+    //No.10>>>!....Funciton to view prescribed medicine to patient......!
+	
+    function viewPrescribedMedicine(address _patientAddress) public view returns(prescribedMedicine memory)
+    {
+        return(prescribedMap[_patientAddress]);
+    } 
+	
+
+    //No.11>>>!....Funciton to view doctor details......!
+    function viewDoctorDetails(uint _docId) public view returns(doctor memory)
+    {
+        return(doctorMap[_docId]);
+    }
+
+   
+}
